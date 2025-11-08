@@ -1,7 +1,12 @@
 self.__BUILD_MANIFEST = {
   "__rewrites": {
     "afterFiles": [],
-    "beforeFiles": [],
+    "beforeFiles": [
+      {
+        "source": "/steerlit-website//_next/:path+",
+        "destination": "/steerlit-website/_next/:path+"
+      }
+    ],
     "fallback": []
   },
   "sortedPages": [
