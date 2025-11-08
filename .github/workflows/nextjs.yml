@@ -40,20 +40,21 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "20.11"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
+          # Use Next integration (respects output: 'export')
           static_site_generator: next
 
-      - name: Restore cache
+      - name: Restore Next.js cache
         uses: actions/cache@v4
         with:
           path: |
             .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.ts', '**/*.tsx') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
       - name: Install dependencies
@@ -61,16 +62,23 @@ jobs:
           if [ "${{ steps.detect-package-manager.outputs.manager }}" = "npm" ]; then
             npm ci --legacy-peer-deps
           else
-            yarn install
+            yarn install --frozen-lockfile
           fi
 
-      - name: Build with Next.js
+      - name: Build (Next.js)
+        env:
+          # Optional: signal production build context if you gate basePath/assetPrefix by NODE_ENV
+          NODE_ENV: production
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
 
-      - name: Export Next.js static site
-        run: ${{ steps.detect-package-manager.outputs.runner }} next export
-      - name: Add .nojekyll for GitHub Pages
-        run: touch out/.nojekyll
+      # Do NOT run `next export` — it was removed; use output: 'export' in next.config.js
+      # Next writes static output to ./out when output: 'export' is set.
+
+      - name: Add .nojekyll (serve _next on Pages)
+        run: |
+          mkdir -p out
+          touch out/.nojekyll
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
