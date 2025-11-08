@@ -7,7 +7,6 @@ const nextConfig = {
     unoptimized: true,
   },
   output: 'export',
-  basePath: '/steerlit-website',
 }
 
 export default nextConfig
