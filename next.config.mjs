@@ -8,7 +8,6 @@ const nextConfig = {
   },
   output: 'export',
   basePath: '/steerlit-website',
-  assetPrefix: '/steerlit-website/',
 }
 
 export default nextConfig
